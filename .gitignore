@@ -8,6 +8,9 @@ node_modules/
 www/
 .cache/
 
+# Ignore Claude - at least for now
+.claude/
+
 # Ignore IDE and editor files
 .vscode/
 .idea/
