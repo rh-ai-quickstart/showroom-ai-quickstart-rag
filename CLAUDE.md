@@ -1,0 +1,53 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What This Is
+
+A Red Hat Showroom lab guide built with [Antora](https://antora.org). Showroom is a split-pane web platform: AsciiDoc instructions on the left, interactive terminals/consoles on the right. This repo is based on the `showroom_template_nookbag` template.
+
+## Local Preview
+
+```sh
+# Podman (recommended)
+podman run --rm --name antora -v $PWD:/antora -p 8080:8080 -i -t ghcr.io/juliaaano/antora-viewer
+
+# On SELinux systems, append :z to the volume mount
+podman run --rm --name antora -v $PWD:/antora:z -p 8080:8080 -i -t ghcr.io/juliaaano/antora-viewer
+```
+
+Preview at http://localhost:8080. The container watches for changes and rebuilds automatically.
+
+## Build (CI)
+
+The GitHub Actions workflow (`.github/workflows/gh-pages.yml`) runs:
+```sh
+npm i -g @antora/cli@3.1 @antora/site-generator@3.1 @sntke/antora-mermaid-extension@0.0.9
+antora --fetch site.yml
+```
+Output goes to `www/`.
+
+## Repository Structure
+
+- `site.yml` — Antora playbook: site title, content sources, UI bundle, extensions, output dir
+- `ui-config.yml` — Showroom UI: tab layout, right-pane tabs (terminals, consoles, external URLs), split width
+- `content/antora.yml` — Antora component descriptor (name, title, version)
+- `content/modules/ROOT/nav.adoc` — Left-side navigation tree
+- `content/modules/ROOT/pages/` — AsciiDoc lab pages (the actual content)
+- `content/supplemental-ui/` — CSS overrides (`css/site-extra.css`), favicon, header template
+- `examples/` — Demo and workshop example pages and templates for reference
+
+## Content Conventions
+
+- Lab pages live in `content/modules/ROOT/pages/` as `.adoc` files
+- Navigation is defined in `content/modules/ROOT/nav.adoc` using `xref:` links
+- Pages are numbered with prefix (e.g., `01-overview.adoc`, `02-module-01.adoc`)
+- The Antora component version is set to `~` (versionless) in `content/antora.yml`
+- Mermaid diagrams are supported via the `@sntke/antora-mermaid-extension`
+- Runtime variables (credentials, hostnames) are injected as AsciiDoc attributes during deployment
+
+## Key Configuration
+
+- **UI bundle**: PatternFly 6 theme from `rhpds/rhdp_showroom_theme`
+- **Showroom collection version**: Set via `showroom-collection-version` attribute in `site.yml`
+- **Right-pane tabs**: Configured in `ui-config.yml` — currently points to Llamastack Docs
