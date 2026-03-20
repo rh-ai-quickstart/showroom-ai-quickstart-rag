@@ -9,6 +9,7 @@ Use retrieval-augmented generation (RAG) to enhance large language models with s
 == Detailed Description
 
 See how FantaCo, a fictional large enterprise, launched a secure RAG chatbot that connects employees to internal HR, procurement, sales, and IT documentation.
+
 From policies to startup guides, employees get fast, accurate answers through a single chat interface.
 Advanced users can extend the experience with AI agents for deeper workflows.
 
@@ -102,9 +103,9 @@ For more details see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/
 
 == Deploy
 
-The instructions below will deploy this quickstart to your OpenShift environment.
+The instructions below will deploy this quickstart to your OpenShift environment. For more details, see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/openshift_setup_guide.md[complete OpenShift deployment guide^].
 
-Please see the <<local-deployment>> section for additional deployment options.
+Please see the <<local-deployment>> section for additional deployment options. For local development and testing, see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/local_setup_guide.md[Local Setup Guide^].
 
 === Prerequisites
 
