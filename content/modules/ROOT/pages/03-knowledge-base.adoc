@@ -31,3 +31,5 @@ For bulk ingestion, upload your source files to the configured S3 bucket and tri
 ====
 Ensure your S3 bucket credentials are configured in the `rag_values.yml` before triggering the pipeline.
 ====
+
+For full details on pipeline parameters, monitoring, and troubleshooting, see xref:07-kubeflow-pipeline.adoc[Kubeflow Ingestion Pipeline].

@@ -1,0 +1,120 @@
+= Kubeflow Ingestion Pipeline
+:navtitle: Kubeflow Pipeline
+
+The RAG quickstart ships with a Kubeflow Pipeline that handles bulk document ingestion.
+When documents are uploaded through the Streamlit UI, the same pipeline is triggered automatically in the background.
+For larger datasets, or when documents live in an S3 bucket, you can run the pipeline directly from *OpenShift AI Data Science Pipelines*.
+
+== What the Pipeline Does
+
+The ingestion pipeline is a multi-step workflow.
+Each step is a self-contained container that runs to completion before the next one starts.
+
+. *Fetch* — the pipeline reads source documents from the configured S3 bucket prefix.
+. *Clean* — raw text is extracted from each file. PDFs are parsed page by page; plain text and Markdown files are read directly. Boilerplate headers, footers, and formatting artefacts are stripped.
+. *Chunk* — the cleaned text is split into overlapping chunks of a fixed token size. Overlapping ensures that context is not lost at chunk boundaries.
+. *Embed* — each chunk is passed through the `all-MiniLM-L6-v2` embedding model (or whichever model was configured during deployment) to produce a fixed-length vector representation.
+. *Store* — the chunk text and its embedding vector are written as a row in PostgreSQL + PGVector under the target collection name. The collection is created if it does not already exist.
+
+Once the pipeline completes, all ingested chunks are immediately available for semantic search in both Chat and Agent modes.
+
+== Prerequisites
+
+Before triggering a pipeline run, confirm the following:
+
+* Source documents have been uploaded to the S3 bucket configured in `rag_values.yml`
+* The `s3.bucketName`, `s3.endpoint`, `s3.accessKey`, and `s3.secretKey` values are set correctly
+* The target namespace (`llama-stack-rag`) is healthy and all pods are running — see xref:02-accessing-the-cluster.adoc[Accessing the Cluster]
+
+[NOTE]
+====
+The pipeline requires network access to the embedding model service inside the cluster.
+Ensure the `llamastack` pod is in `Running` state before starting a run.
+====
+
+== Running the Pipeline from OpenShift AI
+
+. Log in to your OpenShift cluster and open the *OpenShift AI* dashboard.
+. In the left navigation, go to *Data Science Pipelines → Runs*.
+. Select the *RAG Ingestion Pipeline* from the pipeline list.
+. Click *Create Run*.
+. Fill in the run parameters:
++
+[cols="1,2,2",options="header"]
+|===
+|Parameter |Description |Example
+
+|`s3_prefix`
+|The S3 key prefix (folder path) containing your documents
+|`fantaco/hr-docs/`
+
+|`collection_name`
+|The PGVector collection to ingest into — created automatically if it does not exist
+|`hr-policies`
+
+|`chunk_size`
+|Token size for each chunk (default: 512)
+|`512`
+
+|`chunk_overlap`
+|Token overlap between adjacent chunks (default: 50)
+|`50`
+|===
+
+. Click *Submit* to start the run.
+
+== Monitoring a Run
+
+After submitting, you can track progress in the OpenShift AI dashboard under *Data Science Pipelines → Runs*.
+Each pipeline step appears as a node in the run graph. Click any node to see its logs.
+
+You can also watch the pipeline pod directly from the CLI:
+
+[source,bash]
+----
+oc get pods -n llama-stack-rag | grep pipeline
+----
+
+A completed run will show the pod in `Completed` status:
+
+[source]
+----
+NAME                              READY   STATUS      RESTARTS   AGE
+rag-ingest-pipeline-xxxxx         0/1     Completed   0          5m
+----
+
+To stream the logs for a running pipeline pod:
+
+[source,bash]
+----
+oc logs -f <pipeline-pod-name> -n llama-stack-rag
+----
+
+== Verifying Ingestion
+
+Once the run completes, confirm that chunks were written to PGVector by querying the knowledge base.
+Switch to the Streamlit UI, select the collection you ingested into, and ask a question whose answer appears in one of the uploaded documents.
+
+For a deeper check of retrieval quality, see xref:06-querying-knowledge-base.adoc[Querying the Knowledge Base].
+
+== Troubleshooting
+
+[cols="2,3",options="header"]
+|===
+|Symptom |Action
+
+|Pipeline pod stays in `Pending`
+|Check that the `llamastack` pod is `Running`. The pipeline depends on the embedding service being available.
+
+|`ConnectionRefused` error in pod logs
+|Verify the S3 endpoint and credentials in `rag_values.yml` and redeploy if necessary.
+
+|Run completes but no results appear in chat
+|Confirm the `collection_name` parameter matches exactly what is selected in the UI Knowledge Base dropdown.
+
+|Poor retrieval quality after ingestion
+|Try reducing `chunk_size` (e.g., 256) and re-running the pipeline so chunks are more granular.
+
+|PDF pages appear garbled or empty
+|Scanned PDFs require OCR pre-processing before ingestion. Convert them to text-layer PDFs first.
+|===
