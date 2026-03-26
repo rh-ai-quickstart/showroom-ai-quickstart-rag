@@ -1,30 +1,6 @@
 = Creating a Knowledge Base and Adding Documents
 :navtitle: Knowledge Base
 
-The diagram below shows the full document ingestion cycle, from source file to queryable vector embeddings.
-
-[mermaid]
-....
-sequenceDiagram
-    actor User
-    participant UI as Streamlit UI
-    participant S3 as S3 Bucket
-    participant KFP as Kubeflow Pipeline
-    participant Embed as Embedding Model<br/>(all-MiniLM-L6-v2)
-    participant PG as PGVector
-
-    User->>UI: Upload document(s)
-    UI->>S3: Store raw file(s)
-    UI->>KFP: Trigger ingestion pipeline run
-    KFP->>S3: Fetch raw file(s)
-    KFP->>KFP: Clean & chunk text
-    KFP->>Embed: Generate embeddings per chunk
-    Embed-->>KFP: Return embedding vectors
-    KFP->>PG: Store chunks + vectors in collection
-    PG-->>UI: Collection ready
-    UI-->>User: Documents available for querying
-....
-
 The RAG pipeline uses PostgreSQL with the PGVector extension as its vector store. New knowledge bases (collections) and document ingestion are managed through the UI or through Kubeflow Pipelines.
 
 == Creating a New Knowledge Base via the UI

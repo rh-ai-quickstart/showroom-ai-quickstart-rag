@@ -3,33 +3,21 @@
 
 This page describes what good query behaviour looks like and how to validate that your knowledge base is returning relevant results in both Chat and Agent modes.
 
-The diagram below illustrates how a user query travels through the RAG system to produce a grounded response, and how this differs between Chat and Agent modes.
+== How a Query is Processed
 
-[mermaid]
-....
-flowchart TD
-    Q([User Query]) --> Mode{Mode?}
+When you submit a question, the system handles it differently depending on which mode is active.
 
-    Mode -->|Chat| VEC1[Embed query\nall-MiniLM-L6-v2]
-    VEC1 --> RET1[Retrieve top-k chunks\nfrom PGVector]
-    RET1 --> CTX1[Inject chunks\ninto LLM prompt]
-    CTX1 --> LLM1[LLM generates response\nLlama-3.2-3B-Instruct]
-    LLM1 --> ANS1([Response + source citations])
+In *Chat mode*, the query follows a single linear path.
+Your question is first converted into a vector embedding using `all-MiniLM-L6-v2`.
+That embedding is compared against all stored document chunks in PGVector and the closest matches are retrieved.
+Those chunks are injected directly into the LLM prompt as context, and the model generates a response grounded in that retrieved text.
+Source citations are returned alongside the answer so you can trace it back to the originating document.
 
-    Mode -->|Agent| PLAN[Agent plans\nsub-questions]
-    PLAN --> LOOP{More sub-questions?}
-    LOOP -->|Yes| VEC2[Embed sub-query\nall-MiniLM-L6-v2]
-    VEC2 --> RET2[Retrieve top-k chunks\nfrom PGVector]
-    RET2 --> CTX2[Accumulate context]
-    CTX2 --> LOOP
-    LOOP -->|No| LLM2[LLM synthesizes\nfinal answer]
-    LLM2 --> ANS2([Response + full reasoning trace])
-
-    style ANS1 fill:#e8f5e9,stroke:#388e3c
-    style ANS2 fill:#e8f5e9,stroke:#388e3c
-    style Mode fill:#fff3e0,stroke:#f57c00
-    style LOOP fill:#fff3e0,stroke:#f57c00
-....
+In *Agent mode*, the query goes through a planning phase first.
+The LLM breaks your question down into one or more sub-questions and decides which tools to call and in what order.
+For each sub-question it calls the retrieval tool independently — embedding the sub-query, fetching relevant chunks from PGVector, and accumulating the context.
+Once all sub-questions have been answered, the LLM synthesizes everything into a single coherent response.
+The full reasoning trace, including each tool call and its result, is displayed in the UI so you can follow the agent's thinking step by step.
 
 == Effective Query Strategies
 
