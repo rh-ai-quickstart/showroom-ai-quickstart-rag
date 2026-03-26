@@ -1,14 +1,15 @@
 = Centralize Company Knowledge with an Enterprise RAG Chatbot
 :navtitle: Enterprise RAG Chatbot
 
-image:https://img.shields.io/github/v/release/rh-ai-quickstart/RAG[GitHub release,link=https://github.com/rh-ai-quickstart/RAG/releases]
-image:https://img.shields.io/badge/quay.io-llamastack--dist--ui-blue[Quay.io,link=https://quay.io/repository/rh-ai-quickstart/llamastack-dist-ui]
+image:https://img.shields.io/github/v/release/rh-ai-quickstart/RAG[GitHub release,link=https://github.com/rh-ai-quickstart/RAG/releases,window=_blank]
+image:https://img.shields.io/badge/quay.io-llamastack--dist--ui-blue[Quay.io,link=https://quay.io/repository/rh-ai-quickstart/llamastack-dist-ui,window=_blank]
 
 Use retrieval-augmented generation (RAG) to enhance large language models with specialized data sources for more accurate and context-aware responses.
 
 == Detailed Description
 
 See how FantaCo, a fictional large enterprise, launched a secure RAG chatbot that connects employees to internal HR, procurement, sales, and IT documentation.
+
 From policies to startup guides, employees get fast, accurate answers through a single chat interface.
 Advanced users can extend the experience with AI agents for deeper workflows.
 
@@ -27,7 +28,7 @@ This QuickStart allows users to explore the capabilities of RAG by:
 image::https://raw.githubusercontent.com/rh-ai-quickstart/RAG/main/docs/images/rag-architecture.png[RAG System Architecture]
 
 _This diagram illustrates both the ingestion pipeline for document processing and the RAG pipeline for query handling.
-For more details see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/rag-reference-architecture.md[RAG reference architecture]._
+For more details see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/rag-reference-architecture.md[RAG reference architecture^]._
 
 [cols="1,1,3",options="header"]
 |===
@@ -90,7 +91,7 @@ For more details see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/
 
 === Minimum Software Requirements
 
-* OpenShift Client CLI - https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/cli_tools/openshift-cli-oc#installing-openshift-cli[oc]
+* OpenShift Client CLI - https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/cli_tools/openshift-cli-oc#installing-openshift-cli[oc^]
 * OpenShift Cluster 4.18+
 * OpenShift AI
 * Helm CLI - helm
@@ -102,16 +103,16 @@ For more details see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/
 
 == Deploy
 
-The instructions below will deploy this quickstart to your OpenShift environment.
+The instructions below will deploy this quickstart to your OpenShift environment. For more details, see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/openshift_setup_guide.md[complete OpenShift deployment guide^].
 
-Please see the <<local-deployment>> section for additional deployment options.
+Please see the <<local-deployment>> section for additional deployment options. For local development and testing, see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/local_setup_guide.md[Local Setup Guide^].
 
 === Prerequisites
 
-* https://huggingface.co/docs/huggingface_hub/guides/cli[huggingface-cli] (optional)
-* https://huggingface.co/settings/tokens[Hugging Face Token]
-* Access to https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/[Meta Llama] model
-* Access to https://huggingface.co/meta-llama/Llama-Guard-3-8B/[Meta Llama Guard] model
+* https://huggingface.co/docs/huggingface_hub/guides/cli[huggingface-cli^] (optional)
+* https://huggingface.co/settings/tokens[Hugging Face Token^]
+* Access to https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/[Meta Llama^] model
+* Access to https://huggingface.co/meta-llama/Llama-Guard-3-8B/[Meta Llama Guard^] model
 * Some of the example scripts use `jq` a JSON parsing utility which you can acquire via `brew install jq`
 
 [[supported-models]]
@@ -316,7 +317,7 @@ make install NAMESPACE=llama-stack-rag LLM=llama-3-2-3b-instruct SAFETY=llama-gu
 make install NAMESPACE=llama-stack-rag LLM=llama-3-2-3b-instruct SAFETY=llama-guard-3-8b DEVICE=xeon
 ----
 
-When prompted, enter your https://huggingface.co/settings/tokens[Hugging Face Token].
+When prompted, enter your https://huggingface.co/settings/tokens[Hugging Face Token^].
 
 NOTE: This process may take 10 to 30 minutes depending on the number and size of models to be downloaded.
 
@@ -354,12 +355,12 @@ oc get svc -n llama-stack-rag
 oc get routes -n llama-stack-rag
 ----
 
-For detailed post-installation verification, configuration options, and usage instructions, see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/openshift_setup_guide.md[complete OpenShift deployment guide].
+For detailed post-installation verification, configuration options, and usage instructions, see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/openshift_setup_guide.md[complete OpenShift deployment guide^].
 
 [[local-deployment]]
 === Local Deployment
 
-For local development and testing, see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/local_setup_guide.md[Local Setup Guide].
+For local development and testing, see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/local_setup_guide.md[Local Setup Guide^].
 
 == Tags
 
