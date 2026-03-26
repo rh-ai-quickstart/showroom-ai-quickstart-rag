@@ -1,0 +1,30 @@
+= Using Agent Mode
+:navtitle: Agent Mode
+
+Agent mode enables multi-step, agentic RAG. The LLM can plan, reason, and call tools (including the knowledge base retrieval tool) across multiple turns before returning a final answer.
+
+== Starting an Agent Session
+
+. In the sidebar, set *Mode* to *Agent*.
+. Select the knowledge base to make available to the agent as a retrieval tool.
+. Submit your query as you would in chat mode.
+
+== What to Expect
+
+* The agent receives your query and autonomously decides *when* and *how many times* to call the retrieval tool.
+* It can decompose complex questions into sub-queries, retrieve context for each, and synthesize a consolidated answer.
+* Intermediate reasoning steps (tool calls and results) are surfaced in the UI so you can follow the agent's thought process.
+* MCP (Model Context Protocol) servers extend agent capabilities — for example, enabling web search or calling external APIs alongside knowledge base retrieval.
+
+.Example Questions Well-Suited for Agent Mode
+[source]
+----
+"Compare our vacation policy with our sick leave policy and summarize the key differences."
+"Walk me through the full procurement approval process from request to payment."
+"What onboarding steps are specific to the IT department versus HR?"
+----
+
+[TIP]
+====
+Agent mode is best suited for multi-part questions that require synthesizing information from several documents or knowledge base sections.
+====

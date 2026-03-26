@@ -1,0 +1,23 @@
+= Accessing the Cluster
+:navtitle: Accessing the Cluster
+
+After a successful deployment, the RAG Chatbot UI is exposed as an OpenShift Route. Use the `oc` CLI to retrieve the URL.
+
+[source,bash]
+----
+oc get routes -n llama-stack-rag
+----
+
+Look for the route named `llamastack-ui` (or similar). Open the `HOST/PORT` value in your browser — this is the Streamlit chat interface.
+
+.What you should find
+When you open the UI you can expect:
+
+* A chat input box at the bottom of the screen for submitting questions
+* A sidebar exposing configuration options such as:
+** *Knowledge Base* — select which vector store collection to query
+** *Mode* — toggle between *Chat* (simple RAG) and *Agent* (agentic RAG)
+** *Sampling parameters* — adjust temperature, top-p, and max tokens
+** *System prompt* — override the default system prompt
+
+The application comes pre-loaded with FantaCo's internal HR, procurement, sales, and IT documents so you can begin asking questions immediately.

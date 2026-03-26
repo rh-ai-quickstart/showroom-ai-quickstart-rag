@@ -1,0 +1,61 @@
+= Querying the Knowledge Base
+:navtitle: Querying the Knowledge Base
+
+This page describes what good query behaviour looks like and how to validate that your knowledge base is returning relevant results in both Chat and Agent modes.
+
+The diagram below illustrates how a user query travels through the RAG system to produce a grounded response, and how this differs between Chat and Agent modes.
+
+[mermaid]
+....
+flowchart TD
+    Q([User Query]) --> Mode{Mode?}
+
+    Mode -->|Chat| VEC1[Embed query\nall-MiniLM-L6-v2]
+    VEC1 --> RET1[Retrieve top-k chunks\nfrom PGVector]
+    RET1 --> CTX1[Inject chunks\ninto LLM prompt]
+    CTX1 --> LLM1[LLM generates response\nLlama-3.2-3B-Instruct]
+    LLM1 --> ANS1([Response + source citations])
+
+    Mode -->|Agent| PLAN[Agent plans\nsub-questions]
+    PLAN --> LOOP{More sub-questions?}
+    LOOP -->|Yes| VEC2[Embed sub-query\nall-MiniLM-L6-v2]
+    VEC2 --> RET2[Retrieve top-k chunks\nfrom PGVector]
+    RET2 --> CTX2[Accumulate context]
+    CTX2 --> LOOP
+    LOOP -->|No| LLM2[LLM synthesizes\nfinal answer]
+    LLM2 --> ANS2([Response + full reasoning trace])
+
+    style ANS1 fill:#e8f5e9,stroke:#388e3c
+    style ANS2 fill:#e8f5e9,stroke:#388e3c
+    style Mode fill:#fff3e0,stroke:#f57c00
+    style LOOP fill:#fff3e0,stroke:#f57c00
+....
+
+== Effective Query Strategies
+
+* *Be specific* — narrow queries return higher-quality chunks. Instead of "Tell me about HR", ask "What are the steps to request parental leave?"
+* *Use natural language* — the embedding model (`all-MiniLM-L6-v2`) is optimized for sentence-level semantic similarity.
+* *Iterate* — if the first response lacks detail, rephrase or narrow the question and resubmit.
+
+== Expected Results in Chat Mode
+
+* Relevant excerpts from the correct document(s) are cited alongside the answer.
+* For factual, policy-based questions the answer should closely mirror the source document language.
+* If no relevant documents are found, the model will indicate it does not have enough context rather than hallucinating an answer.
+
+== Expected Results in Agent Mode
+
+* The agent may issue *multiple retrieval calls* before composing the final answer — this is expected behaviour for complex queries.
+* Each tool call and its result are visible in the reasoning trace displayed in the UI.
+* The synthesized answer covers all relevant sub-topics and cites the source chunks used at each retrieval step.
+
+== Validating Retrieval Quality
+
+To confirm the knowledge base is returning accurate results:
+
+. Ask a question whose answer appears verbatim in one of your uploaded documents.
+. Check that the cited source matches the expected document.
+. If results are poor, consider:
+** Re-ingesting the document with smaller chunk sizes
+** Increasing the top-k retrieval count in the sidebar
+** Reviewing the document format (scanned PDFs may require OCR pre-processing)

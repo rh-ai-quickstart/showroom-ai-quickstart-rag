@@ -1,2 +1,6 @@
 * xref:index.adoc[Enterprise RAG Chatbot]
-* xref:02-user-journey.adoc[User Journeys]
+* xref:02-accessing-the-cluster.adoc[Accessing the Cluster]
+* xref:03-knowledge-base.adoc[Knowledge Base]
+* xref:04-chat-mode.adoc[Chat Mode]
+* xref:05-agent-mode.adoc[Agent Mode]
+* xref:06-querying-knowledge-base.adoc[Querying the Knowledge Base]
