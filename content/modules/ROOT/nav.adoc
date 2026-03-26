@@ -1,1 +1,2 @@
 * xref:index.adoc[Enterprise RAG Chatbot]
+* xref:02-user-journey.adoc[User Journeys]

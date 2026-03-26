@@ -1,0 +1,169 @@
+= User Journeys
+:navtitle: User Journeys
+
+This page walks through the key user journeys for the Enterprise RAG Chatbot quickstart, from accessing the deployed application on OpenShift to querying your knowledge base with both chat and agent modes.
+
+== Section 1: Accessing the Cluster
+
+After a successful deployment, the RAG Chatbot UI is exposed as an OpenShift Route. Use the `oc` CLI to retrieve the URL.
+
+[source,bash]
+----
+oc get routes -n llama-stack-rag
+----
+
+Look for the route named `llamastack-ui` (or similar). Open the `HOST/PORT` value in your browser — this is the Streamlit chat interface.
+
+.What you should find
+When you open the UI you can expect:
+
+* A chat input box at the bottom of the screen for submitting questions
+* A sidebar exposing configuration options such as:
+** *Knowledge Base* — select which vector store collection to query
+** *Mode* — toggle between **Chat** (simple RAG) and **Agent** (agentic RAG)
+** *Sampling parameters* — adjust temperature, top-p, and max tokens
+** *System prompt* — override the default system prompt
+
+The application comes pre-loaded with FantaCo's internal HR, procurement, sales, and IT documents so you can begin asking questions immediately.
+
+== Section 2: Creating a Knowledge Base and Adding Documents
+
+The RAG pipeline uses PostgreSQL with the PGVector extension as its vector store. New knowledge bases (collections) and document ingestion are managed through the UI or through Kubeflow Pipelines.
+
+=== Creating a New Knowledge Base via the UI
+
+. Open the Streamlit UI and expand the **Knowledge Base** section in the left sidebar.
+. Click **Create New Collection** and enter a unique name for your knowledge base (e.g., `my-kb`).
+. Confirm creation — the new collection is registered in PGVector and is immediately available for selection.
+
+=== Adding Documents via the UI
+
+. With your collection selected, click **Upload Documents**.
+. Choose one or more files (PDF, plain text, Markdown) from your local machine.
+. The UI passes each file through the ingestion pipeline which:
+.. Cleans and chunks the document text
+.. Generates embeddings using `all-MiniLM-L6-v2`
+.. Stores the embedding vectors in PGVector under your chosen collection
+
+=== Adding Documents via Kubeflow Pipelines
+
+For bulk ingestion, upload your source files to the configured S3 bucket and trigger the Kubeflow Pipeline run from OpenShift AI:
+
+. In *OpenShift AI*, navigate to **Data Science Pipelines → Runs**.
+. Select the **RAG Ingestion Pipeline** and click **Create Run**.
+. Provide the S3 bucket prefix containing your documents and click **Submit**.
+. Monitor the run — on completion, all documents are chunked, embedded, and stored in PGVector.
+
+[NOTE]
+====
+Ensure your S3 bucket credentials are configured in the `rag_values.yml` before triggering the pipeline.
+====
+
+== Section 3: Using Chat Mode
+
+Chat mode provides simple, single-turn retrieval-augmented generation. Each query is independently resolved against the selected knowledge base.
+
+=== Starting a Chat Session
+
+. In the sidebar, set **Mode** to **Chat**.
+. Select the knowledge base (collection) you want to query.
+. Type your question in the input box and press *Enter*.
+
+=== What to Expect
+
+* The system retrieves the top-k most relevant document chunks from PGVector based on semantic similarity to your query.
+* Those chunks are inserted into the LLM prompt as context.
+* The LLM (e.g., `Llama-3.2-3B-Instruct`) generates a response grounded in the retrieved context.
+* Responses include source references so you can trace the answer back to the originating document.
+
+.Example Questions for FantaCo's Knowledge Base
+[source]
+----
+"What is the vacation policy for full-time employees?"
+"How do I submit a procurement request?"
+"Where can I find the IT onboarding checklist?"
+----
+
+=== Tuning the Response
+
+Use the sidebar sampling controls to influence output:
+
+[cols="1,3",options="header"]
+|===
+|Parameter |Effect
+
+|Temperature
+|Higher values (e.g., 0.9) increase creativity; lower values (e.g., 0.1) make responses more deterministic.
+
+|Top-p
+|Controls nucleus sampling — lower values restrict the token pool.
+
+|Max Tokens
+|Caps the length of the generated response.
+
+|System Prompt
+|Override the assistant's persona or add extra constraints (e.g., "Answer only in bullet points.").
+|===
+
+== Section 4: Using Agent Mode
+
+Agent mode enables multi-step, agentic RAG. The LLM can plan, reason, and call tools (including the knowledge base retrieval tool) across multiple turns before returning a final answer.
+
+=== Starting an Agent Session
+
+. In the sidebar, set **Mode** to **Agent**.
+. Select the knowledge base to make available to the agent as a retrieval tool.
+. Submit your query as you would in chat mode.
+
+=== What to Expect
+
+* The agent receives your query and autonomously decides *when* and *how many times* to call the retrieval tool.
+* It can decompose complex questions into sub-queries, retrieve context for each, and synthesize a consolidated answer.
+* Intermediate reasoning steps (tool calls and results) are surfaced in the UI so you can follow the agent's thought process.
+* MCP (Model Context Protocol) servers extend agent capabilities — for example, enabling web search or calling external APIs alongside knowledge base retrieval.
+
+.Example Questions Well-Suited for Agent Mode
+[source]
+----
+"Compare our vacation policy with our sick leave policy and summarize the key differences."
+"Walk me through the full procurement approval process from request to payment."
+"What onboarding steps are specific to the IT department versus HR?"
+----
+
+[TIP]
+====
+Agent mode is best suited for multi-part questions that require synthesizing information from several documents or knowledge base sections.
+====
+
+== Section 5: Querying the Knowledge Base
+
+This section describes what good query behavior looks like and how to validate that your knowledge base is returning relevant results in both Chat and Agent modes.
+
+=== Effective Query Strategies
+
+* **Be specific** — narrow queries return higher-quality chunks. Instead of "Tell me about HR", ask "What are the steps to request parental leave?"
+* **Use natural language** — the embedding model (`all-MiniLM-L6-v2`) is optimized for sentence-level semantic similarity.
+* **Iterate** — if the first response lacks detail, rephrase or narrow the question and resubmit.
+
+=== Expected Results in Chat Mode
+
+* **Relevant excerpts** from the correct document(s) are cited alongside the answer.
+* For factual, policy-based questions the answer should closely mirror the source document language.
+* If no relevant documents are found, the model will indicate it does not have enough context rather than hallucinating an answer.
+
+=== Expected Results in Agent Mode
+
+* The agent may issue **multiple retrieval calls** before composing the final answer — this is expected behavior for complex queries.
+* Each tool call and its result are visible in the reasoning trace displayed in the UI.
+* The synthesized answer covers all relevant sub-topics and cites the source chunks used at each retrieval step.
+
+=== Validating Retrieval Quality
+
+To confirm the knowledge base is returning accurate results:
+
+. Ask a question whose answer appears verbatim in one of your uploaded documents.
+. Check that the cited source matches the expected document.
+. If results are poor, consider:
+** Re-ingesting the document with smaller chunk sizes
+** Increasing the top-k retrieval count in the sidebar
+** Reviewing the document format (scanned PDFs may require OCR pre-processing)
