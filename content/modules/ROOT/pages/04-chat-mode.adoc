@@ -1,20 +1,50 @@
 = Using Chat Mode
 :navtitle: Chat Mode
+:imagesdir: ../images
 
-Chat mode provides simple, single-turn retrieval-augmented generation. Each query is independently resolved against the selected knowledge base.
+Chat mode lets you interact with the LLM in a simple, single-turn format. You can use it two ways: with a knowledge base for retrieval-augmented generation (RAG), or without one for a direct conversation with the model.
 
 == Starting a Chat Session
 
 . In the sidebar, set *Mode* to *Chat*.
-. Select the knowledge base (collection) you want to query. (If any)
+. Optionally select a knowledge base (collection) from the dropdown. Leave it unset to chat directly with the LLM. This can be a new knowledge base or an existing one.
++
+image::click-knowledge-base-drop-down.png[Select knowledge base]
 . Type your question in the input box and press *Enter*.
 
-== What to Expect
+[NOTE]
+====
+Since the knowledge base is retrieved, you may need to adjust the *Max Tokens* to increase the length of the response.
+====
+image::max-token-settings.png[Adjust max tokens]
 
-* The system retrieves the top-k most relevant document chunks from PGVector based on semantic similarity to your query.
-* Those chunks are inserted into the LLM prompt as context.
-* The LLM (e.g., `Llama-3.2-3B-Instruct`) generates a response grounded in the retrieved context.
-* Responses include source references so you can trace the answer back to the originating document.
+
+== Chat Without a Knowledge Base
+
+When no knowledge base is selected the LLM responds using only its built-in training data. This is useful for:
+
+* General-purpose questions that don't require proprietary context (e.g., "Explain Kubernetes services in simple terms.").
+* Testing the model's baseline capabilities before layering in RAG.
+* Creative or open-ended prompts where grounding in specific documents isn't needed.
+
+Because there is no retrieval step the response is generated faster, but the model can only draw on what it learned during training — it has no access to your uploaded documents.
+
+.Example Questions (No Knowledge Base)
+[source]
+----
+"What is retrieval-augmented generation?"
+"Write a Python function that reads a CSV file."
+"Summarise the benefits of containerised workloads."
+----
+
+== Chat With a Knowledge Base (RAG)
+
+When a knowledge base is selected the system augments every query with relevant document context:
+
+. The top-k most relevant document chunks are retrieved from PGVector based on semantic similarity to your query.
+. Those chunks are inserted into the LLM prompt as context.
+. The LLM (e.g., `Llama-3.2-3B-Instruct`) generates a response grounded in the retrieved context.
+. Responses include source references so you can trace the answer back to the originating document.
 
 .Example Questions for FantaCo's Knowledge Base
 [source]

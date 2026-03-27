@@ -11,8 +11,6 @@ The RAG pipeline uses PostgreSQL with the PGVector extension as its vector store
 + 
 image::create-new-dropdown.png[Create New dropdown]
 . Confirm creation — the new collection is registered in PGVector and is immediately available for selection.
-+
-image::confirm_creation_knowledge_base.png[Confirm creation of the new collection]
 
 == Adding Documents via the UI
 

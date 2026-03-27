@@ -1,13 +1,48 @@
 = Using Agent Mode
 :navtitle: Agent Mode
 
-Agent mode enables multi-step, agentic RAG. The LLM can plan, reason, and call tools (including the knowledge base retrieval tool) across multiple turns before returning a final answer.
+Agent mode enables multi-step, agentic interaction with the LLM. The model can plan, reason, and call tools across multiple turns before returning a final answer. You can use it with a knowledge base for agentic RAG, or without one so the agent relies solely on its training data and any connected MCP tools.
 
 == Starting an Agent Session
 
 . In the sidebar, set *Mode* to *Agent*.
-. Select the knowledge base to make available to the agent as a retrieval tool.
+. Optionally select a knowledge base to make available to the agent as a retrieval tool. Leave it unset to let the agent work without document retrieval.
 . Submit your query as you would in chat mode.
+
+== Agent Without a Knowledge Base
+
+When no knowledge base is selected the agent still retains its multi-step reasoning and tool-calling abilities, but it has no document retrieval tool to call. This is useful for:
+
+* Exploring what the model can do on its own — reasoning, planning, and answering from training data.
+* Leveraging MCP tools (e.g., web search, external APIs) without mixing in local document context.
+* Creative or analytical tasks that don't depend on proprietary documents, such as code generation or brainstorming.
+
+Because retrieval is not in play the context window is consumed only by MCP tool results and the agent's own reasoning steps, leaving more room for longer conversations.
+
+.Example Questions (No Knowledge Base)
+[source]
+----
+"Research the latest OpenShift AI release notes and summarise the key changes."
+"Write a Python script that connects to a PostgreSQL database and lists all tables."
+"Plan a migration strategy from VMs to containers for a typical three-tier app."
+----
+
+== Agent With a Knowledge Base (Agentic RAG)
+
+When a knowledge base is selected the agent gains access to a retrieval tool backed by PGVector:
+
+* The agent receives your query and autonomously decides *when* and *how many times* to call the retrieval tool.
+* It can decompose complex questions into sub-queries, retrieve context for each, and synthesize a consolidated answer.
+* Intermediate reasoning steps (tool calls and results) are surfaced in the UI so you can follow the agent's thought process.
+* MCP (Model Context Protocol) servers extend agent capabilities — for example, enabling web search or calling external APIs alongside knowledge base retrieval.
+
+.Example Questions for Agentic RAG
+[source]
+----
+"Compare our vacation policy with our sick leave policy and summarize the key differences."
+"Walk me through the full procurement approval process from request to payment."
+"What onboarding steps are specific to the IT department versus HR?"
+----
 
 == Context Window
 
@@ -21,22 +56,7 @@ Set *Max Tokens* to its maximum value in the sidebar when using Agent mode with 
 A full context window gives the model the best chance of retaining all retrieved chunks and tool results across multiple reasoning steps.
 ====
 
-== What to Expect
-
-* The agent receives your query and autonomously decides *when* and *how many times* to call the retrieval tool.
-* It can decompose complex questions into sub-queries, retrieve context for each, and synthesize a consolidated answer.
-* Intermediate reasoning steps (tool calls and results) are surfaced in the UI so you can follow the agent's thought process.
-* MCP (Model Context Protocol) servers extend agent capabilities — for example, enabling web search or calling external APIs alongside knowledge base retrieval.
-
-.Example Questions Well-Suited for Agent Mode
-[source]
-----
-"Compare our vacation policy with our sick leave policy and summarize the key differences."
-"Walk me through the full procurement approval process from request to payment."
-"What onboarding steps are specific to the IT department versus HR?"
-----
-
 [TIP]
 ====
-Agent mode is best suited for multi-part questions that require synthesizing information from several documents or knowledge base sections.
+Agent mode is best suited for multi-part questions that require synthesizing information from several documents or knowledge base sections. If your question is straightforward and single-turn, Chat mode will be faster and simpler.
 ====

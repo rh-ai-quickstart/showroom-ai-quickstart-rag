@@ -7,13 +7,13 @@ This page describes what good query behaviour looks like and how to validate tha
 
 When you submit a question, the system handles it differently depending on which mode is active.
 
-In *Chat mode*, the query follows a single linear path.
+In *xref:04-chat-mode.adoc[Chat mode]*, the query follows a single linear path.
 Your question is first converted into a vector embedding using the loaded embedding model.
 That embedding is compared against all stored document chunks in PGVector and the closest matches are retrieved.
 Those chunks are injected directly into the LLM prompt as context, and the model generates a response grounded in that retrieved text.
 Source citations are returned alongside the answer so you can trace it back to the originating document.
 
-In *Agent mode*, the query goes through a planning phase first.
+In *xref:05-agent-mode.adoc[Agent mode]*, the query goes through a planning phase first.
 The LLM breaks your question down into one or more sub-questions and decides which tools to call and in what order.
 For each sub-question it calls the retrieval tool independently — embedding the sub-query, fetching relevant chunks from PGVector, and accumulating the context.
 Once all sub-questions have been answered, the LLM synthesizes everything into a single coherent response.
@@ -25,13 +25,13 @@ The full reasoning trace, including each tool call and its result, is displayed 
 * *Use natural language* — the embedding model is optimized for sentence-level semantic similarity.
 * *Iterate* — if the first response lacks detail, rephrase or narrow the question and resubmit.
 
-== Expected Results in Chat Mode
+== Expected Results in xref:04-chat-mode.adoc[Chat Mode]
 
 * Relevant excerpts from the correct document(s) are cited alongside the answer.
 * For factual, policy-based questions the answer should closely mirror the source document language.
 * If no relevant documents are found, the model will indicate it does not have enough context rather than hallucinating an answer.
 
-== Expected Results in Agent Mode
+== Expected Results in xref:05-agent-mode.adoc[Agent Mode]
 
 * The agent may issue *multiple retrieval calls* before composing the final answer — this is expected behaviour for complex queries.
 * Each tool call and its result are visible in the reasoning trace displayed in the UI.
