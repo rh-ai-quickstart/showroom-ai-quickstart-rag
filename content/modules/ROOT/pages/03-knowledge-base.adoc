@@ -6,12 +6,10 @@ The RAG pipeline uses PostgreSQL with the PGVector extension as its vector store
 
 == Creating a New Knowledge Base via the UI
 
-. Open the Streamlit UI and expand the *Knowledge Base* section in the left sidebar.
-+
-image::click_knowledge_base.png[Knowledge Base section in the Streamlit UI sidebar]
+. Open the RAG UI and expand the *Knowledge Base* section in the left sidebar.
 . Click *Create New* and enter a unique name for your knowledge base (e.g., `my-kb`).
 + 
-image::click_drop_down_knowledge_base.png[Create New Collection dropdown]
+image::create-new-dropdown.png[Create New dropdown]
 . Confirm creation — the new collection is registered in PGVector and is immediately available for selection.
 +
 image::confirm_creation_knowledge_base.png[Confirm creation of the new collection]
@@ -19,8 +17,6 @@ image::confirm_creation_knowledge_base.png[Confirm creation of the new collectio
 == Adding Documents via the UI
 
 . With your collection selected, click *Upload Documents*.
-+
-image::click_upload_documents.png[Upload Documents button]
 
 . Choose one or more files (PDF, plain text, Markdown) from your local machine.
 . The UI passes each file through the ingestion pipeline which:
