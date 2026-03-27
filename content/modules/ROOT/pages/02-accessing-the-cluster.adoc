@@ -1,7 +1,7 @@
 = Accessing the Cluster
 :navtitle: Accessing the Cluster
 
-After a successful deployment, all RAG components run inside the `llama-stack-rag` namespace on OpenShift.
+All RAG components run inside the `llama-stack-rag` namespace on OpenShift.
 This page walks through what you should see for pods, services, and routes — and how to reach the chatbot UI.
 
 == Checking Pods
@@ -13,7 +13,7 @@ Run the following to list all pods in the namespace:
 oc get pods -n llama-stack-rag
 ----
 
-A healthy deployment will show output similar to the following.
+A healthy cluster will show output similar to the following.
 Every pod should be in `Running` status (or `Completed` for one-shot Job pods):
 
 [source]
@@ -53,8 +53,8 @@ rag-ingest-pipeline-xxxxx                   0/1     Completed   0          12m
 
 [NOTE]
 ====
-The predictor pods show `2/2` ready when running in raw deployment mode.
-If `RAW_DEPLOYMENT=false` was set during installation, expect `3/3`.
+The predictor pods show `2/2` ready in the default configuration.
+If the system was configured with `RAW_DEPLOYMENT=false`, expect `3/3`.
 The `llamastack` pod will not reach `Running` until all predictor pods are healthy.
 ====
 
@@ -110,7 +110,7 @@ postgresql                      ClusterIP   172.30.x.x       5432/TCP    20m
 |vLLM inference endpoint for the generation model
 
 |`llama-guard-3-8b`
-|vLLM inference endpoint for the safety/shield model (if deployed)
+|vLLM inference endpoint for the safety/shield model (if enabled)
 
 |`postgresql`
 |Internal PostgreSQL + PGVector endpoint (port 5432)

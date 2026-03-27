@@ -6,7 +6,7 @@ Chat mode provides simple, single-turn retrieval-augmented generation. Each quer
 == Starting a Chat Session
 
 . In the sidebar, set *Mode* to *Chat*.
-. Select the knowledge base (collection) you want to query.
+. Select the knowledge base (collection) you want to query. (If any)
 . Type your question in the input box and press *Enter*.
 
 == What to Expect
@@ -39,7 +39,7 @@ Use the sidebar sampling controls to influence output:
 |Controls nucleus sampling — lower values restrict the token pool.
 
 |Max Tokens
-|Caps the length of the generated response.
+|Caps the length of the generated response. When RAG retrieval is active, set this as high as possible — retrieved chunks consume a significant portion of the available token budget and a low cap can cause the response to be cut short.
 
 |System Prompt
 |Override the assistant's persona or add extra constraints (e.g., "Answer only in bullet points.").

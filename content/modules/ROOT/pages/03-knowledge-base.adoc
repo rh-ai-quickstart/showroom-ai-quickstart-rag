@@ -6,6 +6,8 @@ The RAG pipeline uses PostgreSQL with the PGVector extension as its vector store
 == Creating a New Knowledge Base via the UI
 
 . Open the Streamlit UI and expand the *Knowledge Base* section in the left sidebar.
++
+image::click_knowledge_base.png[Knowledge Base section in the Streamlit UI sidebar]
 . Click *Create New Collection* and enter a unique name for your knowledge base (e.g., `my-kb`).
 . Confirm creation — the new collection is registered in PGVector and is immediately available for selection.
 
@@ -15,7 +17,7 @@ The RAG pipeline uses PostgreSQL with the PGVector extension as its vector store
 . Choose one or more files (PDF, plain text, Markdown) from your local machine.
 . The UI passes each file through the ingestion pipeline which:
 .. Cleans and chunks the document text
-.. Generates embeddings using `all-MiniLM-L6-v2` as the default embedding model (you can select a different embedding model from the dropdown that was configured during deployment)
+.. Generates embeddings using the loaded embedding model (you can select a different embedding model from the dropdown)
 .. Stores the embedding vectors in PGVector under your chosen collection
 
 == Adding Documents via Kubeflow Pipelines
@@ -29,7 +31,7 @@ For bulk ingestion, upload your source files to the configured S3 bucket and tri
 
 [NOTE]
 ====
-Ensure your S3 bucket credentials are configured in the `rag_values.yml` before triggering the pipeline.
+Ensure your S3 bucket credentials are correctly configured before triggering the pipeline.
 ====
 
 For full details on pipeline parameters, monitoring, and troubleshooting, see xref:07-kubeflow-pipeline.adoc[Kubeflow Ingestion Pipeline].

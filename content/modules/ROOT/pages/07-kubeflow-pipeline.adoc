@@ -13,7 +13,7 @@ Each step is a self-contained container that runs to completion before the next 
 . *Fetch* — the pipeline reads source documents from the configured S3 bucket prefix.
 . *Clean* — raw text is extracted from each file. PDFs are parsed page by page; plain text and Markdown files are read directly. Boilerplate headers, footers, and formatting artefacts are stripped.
 . *Chunk* — the cleaned text is split into overlapping chunks of a fixed token size. Overlapping ensures that context is not lost at chunk boundaries.
-. *Embed* — each chunk is passed through the `all-MiniLM-L6-v2` embedding model (or whichever model was configured during deployment) to produce a fixed-length vector representation.
+. *Embed* — each chunk is passed through the loaded embedding model to produce a fixed-length vector representation.
 . *Store* — the chunk text and its embedding vector are written as a row in PostgreSQL + PGVector under the target collection name. The collection is created if it does not already exist.
 
 Once the pipeline completes, all ingested chunks are immediately available for semantic search in both Chat and Agent modes.
@@ -22,7 +22,7 @@ Once the pipeline completes, all ingested chunks are immediately available for s
 
 Before triggering a pipeline run, confirm the following:
 
-* Source documents have been uploaded to the S3 bucket configured in `rag_values.yml`
+* Source documents have been uploaded to the configured S3 bucket
 * The `s3.bucketName`, `s3.endpoint`, `s3.accessKey`, and `s3.secretKey` values are set correctly
 * The target namespace (`llama-stack-rag`) is healthy and all pods are running — see xref:02-accessing-the-cluster.adoc[Accessing the Cluster]
 
@@ -107,7 +107,7 @@ For a deeper check of retrieval quality, see xref:06-querying-knowledge-base.ado
 |Check that the `llamastack` pod is `Running`. The pipeline depends on the embedding service being available.
 
 |`ConnectionRefused` error in pod logs
-|Verify the S3 endpoint and credentials in `rag_values.yml` and redeploy if necessary.
+|Verify the S3 endpoint and credentials are correctly configured.
 
 |Run completes but no results appear in chat
 |Confirm the `collection_name` parameter matches exactly what is selected in the UI Knowledge Base dropdown.

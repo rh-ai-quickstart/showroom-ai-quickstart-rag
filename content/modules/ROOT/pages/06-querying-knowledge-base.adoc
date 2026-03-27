@@ -8,7 +8,7 @@ This page describes what good query behaviour looks like and how to validate tha
 When you submit a question, the system handles it differently depending on which mode is active.
 
 In *Chat mode*, the query follows a single linear path.
-Your question is first converted into a vector embedding using `all-MiniLM-L6-v2`.
+Your question is first converted into a vector embedding using the loaded embedding model.
 That embedding is compared against all stored document chunks in PGVector and the closest matches are retrieved.
 Those chunks are injected directly into the LLM prompt as context, and the model generates a response grounded in that retrieved text.
 Source citations are returned alongside the answer so you can trace it back to the originating document.
@@ -22,7 +22,7 @@ The full reasoning trace, including each tool call and its result, is displayed 
 == Effective Query Strategies
 
 * *Be specific* — narrow queries return higher-quality chunks. Instead of "Tell me about HR", ask "What are the steps to request parental leave?"
-* *Use natural language* — the embedding model (`all-MiniLM-L6-v2`) is optimized for sentence-level semantic similarity.
+* *Use natural language* — the embedding model is optimized for sentence-level semantic similarity.
 * *Iterate* — if the first response lacks detail, rephrase or narrow the question and resubmit.
 
 == Expected Results in Chat Mode

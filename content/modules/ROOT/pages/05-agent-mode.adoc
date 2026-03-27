@@ -9,6 +9,18 @@ Agent mode enables multi-step, agentic RAG. The LLM can plan, reason, and call t
 . Select the knowledge base to make available to the agent as a retrieval tool.
 . Submit your query as you would in chat mode.
 
+== Context Window
+
+When running in Agent mode with MCP servers and RAG retrieval active at the same time, the LLM prompt fills up quickly.
+Every tool call result — retrieved document chunks, MCP server responses, and the agent's own reasoning steps — is appended to the context before the model generates its next action.
+If the context window is too small, earlier retrieved content gets truncated and the model loses the information it needs to produce a good answer.
+
+[IMPORTANT]
+====
+Set *Max Tokens* to its maximum value in the sidebar when using Agent mode with MCP servers and RAG together.
+A full context window gives the model the best chance of retaining all retrieved chunks and tool results across multiple reasoning steps.
+====
+
 == What to Expect
 
 * The agent receives your query and autonomously decides *when* and *how many times* to call the retrieval tool.
