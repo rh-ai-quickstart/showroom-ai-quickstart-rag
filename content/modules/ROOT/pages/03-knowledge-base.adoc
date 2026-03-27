@@ -1,5 +1,6 @@
 = Creating a Knowledge Base and Adding Documents
 :navtitle: Knowledge Base
+:imagesdir: ../images
 
 The RAG pipeline uses PostgreSQL with the PGVector extension as its vector store. New knowledge bases (collections) and document ingestion are managed through the UI or through Kubeflow Pipelines.
 
@@ -8,30 +9,21 @@ The RAG pipeline uses PostgreSQL with the PGVector extension as its vector store
 . Open the Streamlit UI and expand the *Knowledge Base* section in the left sidebar.
 +
 image::click_knowledge_base.png[Knowledge Base section in the Streamlit UI sidebar]
-. Click *Create New Collection* and enter a unique name for your knowledge base (e.g., `my-kb`).
+. Click *Create New* and enter a unique name for your knowledge base (e.g., `my-kb`).
++ 
+image::click_drop_down_knowledge_base.png[Create New Collection dropdown]
 . Confirm creation — the new collection is registered in PGVector and is immediately available for selection.
++
+image::confirm_creation_knowledge_base.png[Confirm creation of the new collection]
 
 == Adding Documents via the UI
 
 . With your collection selected, click *Upload Documents*.
++
+image::click_upload_documents.png[Upload Documents button]
+
 . Choose one or more files (PDF, plain text, Markdown) from your local machine.
 . The UI passes each file through the ingestion pipeline which:
 .. Cleans and chunks the document text
 .. Generates embeddings using the loaded embedding model (you can select a different embedding model from the dropdown)
 .. Stores the embedding vectors in PGVector under your chosen collection
-
-== Adding Documents via Kubeflow Pipelines
-
-For bulk ingestion, upload your source files to the configured S3 bucket and trigger the Kubeflow Pipeline run from OpenShift AI:
-
-. In *OpenShift AI*, navigate to *Data Science Pipelines → Runs*.
-. Select the *RAG Ingestion Pipeline* and click *Create Run*.
-. Provide the S3 bucket prefix containing your documents and click *Submit*.
-. Monitor the run — on completion, all documents are chunked, embedded, and stored in PGVector.
-
-[NOTE]
-====
-Ensure your S3 bucket credentials are correctly configured before triggering the pipeline.
-====
-
-For full details on pipeline parameters, monitoring, and troubleshooting, see xref:07-kubeflow-pipeline.adoc[Kubeflow Ingestion Pipeline].

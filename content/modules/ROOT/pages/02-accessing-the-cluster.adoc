@@ -21,8 +21,6 @@ Every pod should be in `Running` status (or `Completed` for one-shot Job pods):
 NAME                                        READY   STATUS      RESTARTS   AGE
 llamastack-ui-xxxxxxxxx-xxxxx               1/1     Running     0          10m
 llamastack-xxxxxxxxx-xxxxx                  1/1     Running     0          10m
-llama-3-2-3b-instruct-predictor-xxxxx       2/2     Running     0          15m
-llama-guard-3-8b-predictor-xxxxx            2/2     Running     0          15m
 postgresql-xxxxxxxxx-xxxxx                  1/1     Running     0          20m
 rag-ingest-pipeline-xxxxx                   0/1     Completed   0          12m
 ----
@@ -91,7 +89,6 @@ NAME                            TYPE        CLUSTER-IP       PORT(S)     AGE
 llamastack                      ClusterIP   172.30.x.x       5000/TCP    20m
 llamastack-ui                   ClusterIP   172.30.x.x       8501/TCP    20m
 llama-3-2-3b-instruct           ClusterIP   172.30.x.x       8080/TCP    20m
-llama-guard-3-8b                ClusterIP   172.30.x.x       8080/TCP    20m
 postgresql                      ClusterIP   172.30.x.x       5432/TCP    20m
 ----
 
