@@ -5,13 +5,20 @@ The RAG quickstart ships with a Kubeflow Pipeline that handles bulk document ing
 When documents are uploaded through the Streamlit UI, the same pipeline is triggered automatically in the background.
 For larger datasets, or when documents live in an S3 bucket, you can run the pipeline directly from *OpenShift AI Data Science Pipelines*.
 
+[NOTE]
+====
+A toggle to switch between local extraction/chunking and pipeline-based extraction/chunking is being added.
+When available, users will be able to choose whether documents are processed directly inside the application or offloaded to this Kubeflow Pipeline.
+See xref:03-knowledge-base.adoc[Knowledge Base] for details on the two modes.
+====
+
 == What the Pipeline Does
 
 The ingestion pipeline is a multi-step workflow.
 Each step is a self-contained container that runs to completion before the next one starts.
 
 . *Fetch* — the pipeline reads source documents from the configured S3 bucket prefix.
-. *Clean* — raw text is extracted from each file. PDFs are parsed page by page; plain text and Markdown files are read directly. Boilerplate headers, footers, and formatting artefacts are stripped.
+. *Clean* — raw text is extracted from each file. PDFs are parsed page by page; plain text and Markdown files are read directly. Boilerplate headers, footers, and formatting artefacts are stripped. Support for `.docx` and `.xlsx` extraction is being added in an upcoming release.
 . *Chunk* — the cleaned text is split into overlapping chunks of a fixed token size. Overlapping ensures that context is not lost at chunk boundaries.
 . *Embed* — each chunk is passed through the loaded embedding model to produce a fixed-length vector representation.
 . *Store* — the chunk text and its embedding vector are written as a row in PostgreSQL + PGVector under the target collection name. The collection is created if it does not already exist.
