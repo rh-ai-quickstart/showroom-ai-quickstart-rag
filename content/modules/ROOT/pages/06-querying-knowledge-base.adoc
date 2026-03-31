@@ -1,7 +1,33 @@
 = Querying the Knowledge Base
 :navtitle: Querying the Knowledge Base
 
-This page describes what good query behaviour looks like and how to validate that your knowledge base is returning relevant results in both Chat and Agent modes.
+This page walks through how to query your knowledge base and validate that retrieval is returning relevant results.
+
+== Try It: Query in Chat Mode
+
+. In the sidebar, set *Mode* to *Chat*.
+. Select a knowledge base from the *Knowledge Base* dropdown (e.g., one of the pre-loaded FantaCo collections).
+. Type a question whose answer you know appears in the uploaded documents:
++
+[source]
+----
+"What is the vacation policy for full-time employees?"
+----
+. Press *Enter*.
+. *Expected result* — the response cites specific excerpts from the matching document(s). The answer should closely mirror the source document language. Source references appear alongside the response so you can verify where the information came from.
+
+== Try It: Query in Agent Mode
+
+. In the sidebar, set *Mode* to *Agent*.
+. Select the same knowledge base.
+. Ask a more complex, multi-part question:
++
+[source]
+----
+"Compare the vacation policy with the sick leave policy and summarize the key differences."
+----
+. Press *Enter*.
+. *Expected result* — the agent issues multiple retrieval calls (visible in the reasoning trace), retrieves chunks from different documents, and synthesizes a consolidated answer that covers both policies. Each tool call and its result are shown as collapsible sections in the chat window.
 
 == How a Query is Processed
 
@@ -25,25 +51,31 @@ The full reasoning trace, including each tool call and its result, is displayed 
 * *Use natural language* — the embedding model is optimized for sentence-level semantic similarity.
 * *Iterate* — if the first response lacks detail, rephrase or narrow the question and resubmit.
 
-== Expected Results in xref:04-chat-mode.adoc[Chat Mode]
-
-* Relevant excerpts from the correct document(s) are cited alongside the answer.
-* For factual, policy-based questions the answer should closely mirror the source document language.
-* If no relevant documents are found, the model will indicate it does not have enough context rather than hallucinating an answer.
-
-== Expected Results in xref:05-agent-mode.adoc[Agent Mode]
-
-* The agent may issue *multiple retrieval calls* before composing the final answer — this is expected behaviour for complex queries.
-* Each tool call and its result are visible in the reasoning trace displayed in the UI.
-* The synthesized answer covers all relevant sub-topics and cites the source chunks used at each retrieval step.
-
 == Validating Retrieval Quality
 
 To confirm the knowledge base is returning accurate results:
 
 . Ask a question whose answer appears verbatim in one of your uploaded documents.
 . Check that the cited source matches the expected document.
-. If results are poor, consider:
-** Re-ingesting the document with smaller chunk sizes
-** Increasing the top-k retrieval count in the sidebar
-** Reviewing the document format (scanned PDFs may require OCR pre-processing)
+. Compare the response text against the original document to verify accuracy.
+. If results are poor, try the following adjustments:
+
+[cols="1,2",options="header"]
+|===
+|Adjustment |How It Helps
+
+|Reduce chunk size
+|Smaller chunks are more granular. Re-ingest the document with a lower `chunk_size` (e.g., 256).
+
+|Increase top-k
+|Retrieve more candidate chunks so the model has a wider pool of context.
+
+|Rephrase the query
+|The embedding model matches on semantic similarity — rewording can surface different chunks.
+
+|Check document format
+|Scanned PDFs require OCR pre-processing. Convert them to text-layer PDFs before uploading.
+
+|Switch embedding model
+|Select a different embedding model from the sidebar dropdown to see if a different model captures the semantics better.
+|===

@@ -20,7 +20,7 @@ Each step is a self-contained container that runs to completion before the next 
 . *Fetch* — the pipeline reads source documents from the configured S3 bucket prefix.
 . *Clean* — raw text is extracted from each file. PDFs are parsed page by page; plain text and Markdown files are read directly. Boilerplate headers, footers, and formatting artefacts are stripped. Support for `.docx` and `.xlsx` extraction is being added in an upcoming release.
 . *Chunk* — the cleaned text is split into overlapping chunks of a fixed token size. Overlapping ensures that context is not lost at chunk boundaries.
-. *Embed* — each chunk is passed through the loaded embedding model to produce a fixed-length vector representation.
+. *Embed* — each chunk is passed through the configured embedding model (default: `nomic-ai/nomic-embed-text-v1.5`) to produce a fixed-length vector representation.
 . *Store* — the chunk text and its embedding vector are written as a row in PostgreSQL + PGVector under the target collection name. The collection is created if it does not already exist.
 
 Once the pipeline completes, all ingested chunks are immediately available for semantic search in both Chat and Agent modes.
@@ -41,7 +41,7 @@ Ensure the `llamastack` pod is in `Running` state before starting a run.
 
 == Running the Pipeline from OpenShift AI
 
-. Log in to your OpenShift cluster and open the *OpenShift AI* dashboard.
+. Switch to the *OpenShift* tab on the right side of the showroom. This opens the OpenShift AI dashboard for your provisioned cluster.
 . In the left navigation, go to *Data Science Pipelines → Runs*.
 . Select the *RAG Ingestion Pipeline* from the pipeline list.
 . Click *Create Run*.

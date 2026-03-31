@@ -6,7 +6,7 @@ image:https://img.shields.io/badge/quay.io-llamastack--dist--ui-blue[Quay.io,lin
 
 Use retrieval-augmented generation (RAG) to enhance large language models with specialized data sources for more accurate and context-aware responses.
 
-== Detailed Description
+== About This QuickStart
 
 See how FantaCo, a fictional large enterprise, launched a secure RAG chatbot that connects employees to internal HR, procurement, sales, and IT documentation.
 
@@ -15,15 +15,56 @@ Advanced users can extend the experience with AI agents for deeper workflows.
 
 Retrieval-Augmented Generation (RAG) enhances Large Language Models (LLMs) by retrieving relevant external knowledge to improve accuracy, reduce hallucinations, and support domain-specific conversations.
 
-This QuickStart allows users to explore the capabilities of RAG by:
+== What You Can Do
 
-* Exploring FantaCo's solution
-* Uploading new documents to be embedded
-* Tweaking sampling parameters to influence LLM responses
-* Using custom system prompts
-* Switching between simple and agent based RAG
+The application comes pre-loaded with FantaCo's internal documents so you can begin exploring immediately.
+Use the sidebar on the left to configure the experience:
 
-=== Architecture Diagrams
+=== Switch Between Modes
+
+* *Chat* — simple, single-turn RAG. Select a knowledge base, ask a question, and get a grounded answer with source citations. See xref:04-chat-mode.adoc[Chat Mode].
+* *Agent* — multi-step, agentic RAG. The LLM plans, reasons, and calls tools (e.g., knowledge base retrieval, web search) across multiple turns before returning a final answer. See xref:05-agent-mode.adoc[Agent Mode].
+
+=== Tune Model Parameters
+
+The sidebar exposes several sampling controls that influence how the LLM generates responses:
+
+[cols="1,3",options="header"]
+|===
+|Parameter |What It Does
+
+|*Temperature*
+|Controls randomness. Lower values (e.g., 0.1) produce more deterministic, focused answers. Higher values (e.g., 0.9) increase creativity and variation.
+
+|*Top-p*
+|Nucleus sampling — limits the token pool to the smallest set whose cumulative probability exceeds this threshold. Lower values make output more conservative.
+
+|*Top-k*
+|Restricts the model to sampling from only the _k_ most likely next tokens. Lower values reduce randomness; higher values allow more diversity.
+
+|*Max Tokens*
+|Caps the length of the generated response. When RAG retrieval is active, set this high — retrieved chunks consume a significant portion of the token budget.
+
+|*System Prompt*
+|Override the assistant's persona or add constraints (e.g., "Answer only in bullet points." or "Respond in Spanish.").
+|===
+
+=== Work With Knowledge Bases
+
+* Browse, create, and select knowledge base collections backed by PostgreSQL + PGVector.
+* Upload your own documents (PDF, plain text, Markdown) to create a custom knowledge base — see xref:03-knowledge-base.adoc[Bring Your Own Documents].
+* Choose which embedding model to use from the sidebar dropdown.
+
+=== Use Agent Tools
+
+When running in Agent mode, the LLM can call tools to extend its capabilities beyond its training data:
+
+* *Knowledge Base Retrieval* — semantic search over your uploaded documents.
+* *Web Search* — query the internet for up-to-date information the model was not trained on.
+
+See xref:05-agent-mode.adoc[Agent Mode] for a walkthrough that demonstrates how tools appear in the chat window.
+
+== Architecture
 
 image::https://raw.githubusercontent.com/rh-ai-quickstart/RAG/main/docs/images/rag-architecture.png[RAG System Architecture]
 
@@ -54,12 +95,12 @@ For more details see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/
 |Safety Guardrail
 |Blocks harmful requests and responses for secure AI interactions
 
-|Integration
-|MCP Servers
-|Model Context Protocol servers for enhanced functionality
+|Tools
+|Web Search, Knowledge Base Retrieval
+|Extend agent capabilities with external data sources and retrieval tools
 
 |Embedding
-|Sentence embedding model
+|`nomic-ai/nomic-embed-text-v1.5`
 |Converts text to vector embeddings
 
 |Vector DB
@@ -79,28 +120,6 @@ For more details see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/
 |Document source for enterprise content
 |===
 
-== Requirements
-
-=== Minimum Hardware Requirements
-
-* 1 GPU/HPU with 24GB of VRAM for the LLM, refer to the <<supported-models,chart below>>
-* 1 GPU/HPU with 24GB of VRAM for the safety/shield model (optional)
-* Xeon deployments: one worker node with Intel Xeon processors, Sapphire Rapids (SPR) or newer (EMR/GNR)
-** For example: m8i.8xlarge, m7i.8xlarge, r8i.8xlarge
-** vLLM requires a minimum of 16 vCPUs and 64 GB of RAM to run
-
-=== Minimum Software Requirements
-
-* OpenShift Client CLI - https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/cli_tools/openshift-cli-oc#installing-openshift-cli[oc^]
-* OpenShift Cluster 4.18+
-* OpenShift AI
-* Helm CLI - helm
-
-=== Required User Permissions
-
-* Regular user permission
-* Cluster admin required for _advanced_ configurations
-
 [[supported-models]]
 == Supported Models
 
@@ -109,7 +128,7 @@ For more details see the https://github.com/rh-ai-quickstart/RAG/blob/main/docs/
 |Function |Model Name |Hardware |AWS
 
 |Embedding
-|Sentence embedding model
+|`nomic-ai/nomic-embed-text-v1.5`
 |CPU/GPU/HPU
 |
 

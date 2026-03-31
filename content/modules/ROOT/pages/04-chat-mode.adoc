@@ -4,55 +4,67 @@
 
 Chat mode lets you interact with the LLM in a simple, single-turn format. You can use it two ways: with a knowledge base for retrieval-augmented generation (RAG), or without one for a direct conversation with the model.
 
-== Starting a Chat Session
+== Try It: Direct Chat (No Knowledge Base)
+
+Follow these steps to chat directly with the LLM without retrieval:
 
 . In the sidebar, set *Mode* to *Chat*.
-. Optionally select a knowledge base (collection) from the dropdown. Leave it unset to chat directly with the LLM. This can be a new knowledge base or an existing one.
+. Make sure no knowledge base is selected — leave the *Knowledge Base* dropdown unset.
+. Type a question in the input box and press *Enter*. For example:
 +
-image::click-knowledge-base-drop-down.png[Select knowledge base]
-. Type your question in the input box and press *Enter*.
-
-[NOTE]
-====
-Since the knowledge base is retrieved, you may need to adjust the *Max Tokens* to increase the length of the response.
-====
-image::max-token-settings.png[Adjust max tokens]
-
-
-== Chat Without a Knowledge Base
-
-When no knowledge base is selected the LLM responds using only its built-in training data. This is useful for:
-
-* General-purpose questions that don't require proprietary context (e.g., "Explain Kubernetes services in simple terms.").
-* Testing the model's baseline capabilities before layering in RAG.
-* Creative or open-ended prompts where grounding in specific documents isn't needed.
-
-Because there is no retrieval step the response is generated faster, but the model can only draw on what it learned during training — it has no access to your uploaded documents.
-
-.Example Questions (No Knowledge Base)
 [source]
 ----
 "What is retrieval-augmented generation?"
-"Write a Python function that reads a CSV file."
-"Summarise the benefits of containerised workloads."
 ----
+. *Expected result* — the model responds using only its built-in training data. The answer will be general-purpose and will not reference any uploaded documents. No source citations appear because there is no retrieval step.
 
-== Chat With a Knowledge Base (RAG)
+== Try It: Chat With a Knowledge Base (RAG)
+
+Follow these steps to chat with RAG retrieval:
+
+. In the sidebar, set *Mode* to *Chat*.
+. Select a knowledge base from the *Knowledge Base* dropdown (e.g., one of the pre-loaded FantaCo collections).
++
+image::click-knowledge-base-drop-down.png[Select knowledge base]
+. Type a question that relates to the documents in that collection and press *Enter*. For example:
++
+[source]
+----
+"What is the vacation policy for full-time employees?"
+----
+. *Expected result* — the model returns an answer grounded in the retrieved document chunks. Source citations appear alongside the response so you can trace the answer back to the originating document. The response should closely mirror the language in the source documents.
+
+[NOTE]
+====
+Since the knowledge base is retrieved, you may need to increase *Max Tokens* in the sidebar. Retrieved chunks consume a significant portion of the token budget, and a low cap can cause the response to be cut short.
+====
+image::max-token-settings.png[Adjust max tokens]
+
+== How RAG Retrieval Works
 
 When a knowledge base is selected the system augments every query with relevant document context:
 
-. The top-k most relevant document chunks are retrieved from PGVector based on semantic similarity to your query.
+. Your question is converted into a vector embedding using the loaded embedding model.
+. The top-k most relevant document chunks are retrieved from PGVector based on semantic similarity.
 . Those chunks are inserted into the LLM prompt as context.
 . The LLM (e.g., `Llama-3.2-3B-Instruct`) generates a response grounded in the retrieved context.
 . Responses include source references so you can trace the answer back to the originating document.
 
-.Example Questions for FantaCo's Knowledge Base
-[source]
-----
-"What is the vacation policy for full-time employees?"
-"How do I submit a procurement request?"
-"Where can I find the IT onboarding checklist?"
-----
+== When to Use Each Approach
+
+[cols="1,1",options="header"]
+|===
+|Direct Chat (No KB) |Chat With Knowledge Base
+
+|General-purpose questions that don't need proprietary context
+|Questions about specific documents you've uploaded
+
+|Testing the model's baseline capabilities before layering in RAG
+|Policy, procedure, or reference lookups
+
+|Creative or open-ended prompts
+|Any question where you need grounded, citable answers
+|===
 
 == Tuning the Response
 
@@ -67,6 +79,9 @@ Use the sidebar sampling controls to influence output:
 
 |Top-p
 |Controls nucleus sampling — lower values restrict the token pool.
+
+|Top-k
+|Restricts sampling to the _k_ most likely tokens — lower values reduce randomness.
 
 |Max Tokens
 |Caps the length of the generated response. When RAG retrieval is active, set this as high as possible — retrieved chunks consume a significant portion of the available token budget and a low cap can cause the response to be cut short.
