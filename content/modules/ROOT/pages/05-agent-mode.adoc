@@ -108,3 +108,6 @@ A full context window gives the model the best chance of retaining all retrieved
 ====
 Agent mode is best suited for multi-part questions that require synthesizing information from several documents or knowledge base sections. If your question is straightforward and single-turn, Chat mode will be faster and simpler.
 ====
+
+[.next-nav]
+xref:06-querying-knowledge-base.adoc[Next: Querying the Knowledge Base →]

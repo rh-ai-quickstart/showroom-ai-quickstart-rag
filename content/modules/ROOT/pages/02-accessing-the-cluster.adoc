@@ -1,29 +1,28 @@
 = Accessing the Cluster
 :navtitle: Accessing the Cluster
+:imagesdir: ../images
 
 All RAG components run inside the `llama-stack-rag` namespace on OpenShift.
 This page walks through what you should see for pods, services, and routes — and how to reach the chatbot UI.
 
+== Accessing the Cluster
+From the OpenShift Demo Platform click advanced settings. In the advanced settings is a username and password to login to the cluster.
+
+image::advanced-settings.png[Advanced settings]
+
+Next we need to login to the cluster via the OpenShift UI. In the demo platform click the OpenShift UI button at the top right.
+
+image::openshift-click.png[OpenShift UI]
+
+Login with the username and password from the advanced settings.
+
 == Checking Pods
 
-Run the following to list all pods in the namespace:
+After logging in to the OpenShift UI, we need to check the pods in the namespace. You will see a single project in the UI. In the top left hand corner click on the hamburger menu and select "Workloads/Pods".
 
-[source,bash]
-----
-oc get pods -n llama-stack-rag
-----
+image::pods.png[Pods]
 
-A healthy cluster will show output similar to the following.
-Every pod should be in `Running` status (or `Completed` for one-shot Job pods):
-
-[source]
-----
-NAME                                        READY   STATUS      RESTARTS   AGE
-llamastack-ui-xxxxxxxxx-xxxxx               1/1     Running     0          10m
-llamastack-xxxxxxxxx-xxxxx                  1/1     Running     0          10m
-postgresql-xxxxxxxxx-xxxxx                  1/1     Running     0          20m
-rag-ingest-pipeline-xxxxx                   0/1     Completed   0          12m
-----
+A healthy cluster will show output similar to the photo above.
 
 .Key pods to verify
 [cols="2,3",options="header"]
@@ -56,9 +55,15 @@ If the system was configured with `RAW_DEPLOYMENT=false`, expect `3/3`.
 The `llamastack` pod will not reach `Running` until all predictor pods are healthy.
 ====
 
-=== Filtering by Component
+=== Using the CLI to check pods
 
-To focus on just the model server pods:
+In order to run commands from the CLI, we need to login to the cluster via the CLI. Navigate to the OpenShift UI and click the button in the top right corner that says "Copy Login Command".
+
+image::login-command.png[Copy Login Command]
+
+Paste the command into the terminal and press enter.
+
+Now we can run commands to check the pods.
 
 [source,bash]
 ----
@@ -76,20 +81,15 @@ oc get pods -l app.kubernetes.io/name=llamastack -n llama-stack-rag
 
 Services expose each component internally within the cluster:
 
+In the OpenShift UI, click on the "Networking/Services" menu item in the left hand navigation.
+
+image::services.png[Services]
+
+Or run the following command from the CLI:
+
 [source,bash]
 ----
 oc get svc -n llama-stack-rag
-----
-
-Expected output:
-
-[source]
-----
-NAME                            TYPE        CLUSTER-IP       PORT(S)     AGE
-llamastack                      ClusterIP   172.30.x.x       5000/TCP    20m
-llamastack-ui                   ClusterIP   172.30.x.x       8501/TCP    20m
-llama-3-2-3b-instruct           ClusterIP   172.30.x.x       8080/TCP    20m
-postgresql                      ClusterIP   172.30.x.x       5432/TCP    20m
 ----
 
 .What each service does
@@ -103,19 +103,17 @@ postgresql                      ClusterIP   172.30.x.x       5432/TCP    20m
 |`llamastack-ui`
 |Internal HTTP endpoint for the Streamlit UI (port 8501)
 
-|`llama-3-2-3b-instruct`
-|vLLM inference endpoint for the generation model
-
-|`llama-guard-3-8b`
-|vLLM inference endpoint for the safety/shield model (if enabled)
-
 |`postgresql`
 |Internal PostgreSQL + PGVector endpoint (port 5432)
 |===
 
 == Checking Routes
 
-Routes expose the UI and API to the outside world. Retrieve them with:
+Routes expose the UI and API to the outside world. In the OpenShift UI, click on the "Networking/Routes" menu item in the left hand navigation.
+
+image::routes.png[Routes]
+
+Or run the following command from the CLI:
 
 [source,bash]
 ----
@@ -157,3 +155,6 @@ When the Streamlit UI loads you will see:
 ** *System prompt* — override the default system prompt
 
 The application comes pre-loaded with FantaCo's internal HR, procurement, sales, and IT documents so you can begin asking questions immediately.
+
+[.next-nav]
+xref:03-knowledge-base.adoc[Next: Knowledge Base →]

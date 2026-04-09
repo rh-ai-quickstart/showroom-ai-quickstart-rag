@@ -125,3 +125,6 @@ For a deeper check of retrieval quality, see xref:06-querying-knowledge-base.ado
 |PDF pages appear garbled or empty
 |Scanned PDFs require OCR pre-processing before ingestion. Convert them to text-layer PDFs first.
 |===
+
+[.next-nav]
+xref:index.adoc[Back to Enterprise RAG Chatbot →]
