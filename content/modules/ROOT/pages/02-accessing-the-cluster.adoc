@@ -2,8 +2,13 @@
 :navtitle: Accessing the Cluster
 :imagesdir: ../images
 
-All RAG components run inside the `llama-stack-rag` namespace on OpenShift.
+All RAG components run inside *your* OpenShift *project* (Kubernetes namespace) for this lab — for example, in the AI Quickstart RAG catalog deployment the namespace is typically `user-<unique-id>-rag`, not a fixed name like `llama-stack-rag`.
 This page walks through what you should see for pods, services, and routes — and how to reach the chatbot UI.
+
+[NOTE]
+====
+In every `oc` command below, replace `NAMESPACE` with your project name from the OpenShift console (the project selector in the upper left), or from your lab environment instructions.
+====
 
 == Accessing the Cluster
 From the OpenShift Demo Platform click advanced settings. In the advanced settings is a username and password to login to the cluster.
@@ -35,12 +40,6 @@ A healthy cluster will show output similar to the photo above.
 |`llamastack`
 |LlamaStack server — orchestrates the LLM, embeddings, and tools
 
-|`predictor` (LLM)
-|KServe / vLLM model server for the generation model (e.g., `Llama-3.2-3B-Instruct`)
-
-|`predictor` (safety)
-|KServe / vLLM model server for the guard/shield model (e.g., `Llama-Guard-3-8B`) — only present if safety was enabled
-
 |`postgresql`
 |PostgreSQL + PGVector — stores document embeddings for the vector store
 
@@ -57,24 +56,39 @@ The `llamastack` pod will not reach `Running` until all predictor pods are healt
 
 === Using the CLI to check pods
 
-In order to run commands from the CLI, we need to login to the cluster via the CLI. Navigate to the OpenShift UI and click the button in the top right corner that says "Copy Login Command".
+To run CLI commands against the cluster, you first need to log in via the CLI. In the OpenShift UI, click the button in the top right corner labeled "Copy Login Command".
 
 image::login-command.png[Copy Login Command]
 
-Paste the command into the terminal and press enter.
+The login command will look something like this:
+[source,bash]
+----
+oc login --token=sha256~8uvgDNglxuJ3l_NwHMuWYPaJWur_dmtuq-4r5sUalU4 --server=https://api.ai-dev02.kni.syseng.devcluster.openshift.com:6443
+----
 
-Now we can run commands to check the pods.
+Paste this command into your terminal and press Enter.
+
+[NOTE]
+====
+If your cluster uses self-signed certificates, you may need to add the `--insecure-skip-tls-verify=true` flag to the login command, like so:
+[source,bash]
+----
+oc login --token=... --server=... --insecure-skip-tls-verify=true
+----
+====
+
+Once you've logged in, you can run commands to check the pods.
 
 [source,bash]
 ----
-oc get pods -l component=predictor -n llama-stack-rag
+oc get pods -l component=predictor -n NAMESPACE
 ----
 
 To check the LlamaStack orchestration pod specifically:
 
 [source,bash]
 ----
-oc get pods -l app.kubernetes.io/name=llamastack -n llama-stack-rag
+oc get pods -l app.kubernetes.io/name=llamastack -n NAMESPACE
 ----
 
 == Checking Services
@@ -89,7 +103,7 @@ Or run the following command from the CLI:
 
 [source,bash]
 ----
-oc get svc -n llama-stack-rag
+oc get svc -n NAMESPACE
 ----
 
 .What each service does
@@ -117,7 +131,7 @@ Or run the following command from the CLI:
 
 [source,bash]
 ----
-oc get routes -n llama-stack-rag
+oc get routes -n NAMESPACE
 ----
 
 Expected output:
@@ -125,9 +139,12 @@ Expected output:
 [source]
 ----
 NAME              HOST/PORT                                                    PATH   SERVICES        PORT    TERMINATION   WILDCARD
-llamastack        llamastack-llama-stack-rag.apps.<cluster-domain>                    llamastack      5000    edge          None
-llamastack-ui     llamastack-ui-llama-stack-rag.apps.<cluster-domain>                llamastack-ui   8501    edge          None
+llamastack        llamastack-NAMESPACE.apps.cluster-domain                            llamastack      5000    edge          None
+llamastack-ui     llamastack-ui-NAMESPACE.apps.cluster-domain                         llamastack-ui   8501    edge          None
 ----
+
+Where `NAMESPACE` is the same project name you passed to `oc get routes -n`, and `cluster-domain` stands for your cluster's apps ingress domain (the DNS suffix that appears after `apps.` in a typical route hostname).
+The `HOST/PORT` values are assigned by your cluster — copy the exact URLs from your own `oc get routes` output instead of reconstructing them from a generic example.
 
 .Route breakdown
 [cols="2,3",options="header"]
