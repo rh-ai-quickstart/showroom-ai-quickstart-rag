@@ -31,7 +31,7 @@ Before triggering a pipeline run, confirm the following:
 
 * Source documents have been uploaded to the configured S3 bucket
 * The `s3.bucketName`, `s3.endpoint`, `s3.accessKey`, and `s3.secretKey` values are set correctly
-* The target namespace (`llama-stack-rag`) is healthy and all pods are running — see xref:02-accessing-the-cluster.adoc[Accessing the Cluster]
+* Your RAG OpenShift project (namespace) is healthy and all pods are running — use the same `NAMESPACE` as in xref:02-accessing-the-cluster.adoc[Accessing the Cluster]
 
 [NOTE]
 ====
@@ -79,7 +79,7 @@ You can also watch the pipeline pod directly from the CLI:
 
 [source,bash]
 ----
-oc get pods -n llama-stack-rag | grep pipeline
+oc get pods -n NAMESPACE | grep pipeline
 ----
 
 A completed run will show the pod in `Completed` status:
@@ -94,7 +94,7 @@ To stream the logs for a running pipeline pod:
 
 [source,bash]
 ----
-oc logs -f <pipeline-pod-name> -n llama-stack-rag
+oc logs -f <pipeline-pod-name> -n NAMESPACE
 ----
 
 == Verifying Ingestion
@@ -125,3 +125,6 @@ For a deeper check of retrieval quality, see xref:06-querying-knowledge-base.ado
 |PDF pages appear garbled or empty
 |Scanned PDFs require OCR pre-processing before ingestion. Convert them to text-layer PDFs first.
 |===
+
+[.next-nav]
+xref:index.adoc[Back to Enterprise RAG Chatbot →]

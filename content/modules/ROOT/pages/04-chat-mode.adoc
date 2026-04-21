@@ -89,3 +89,6 @@ Use the sidebar sampling controls to influence output:
 |System Prompt
 |Override the assistant's persona or add extra constraints (e.g., "Answer only in bullet points.").
 |===
+
+[.next-nav]
+xref:05-agent-mode.adoc[Next: Agent Mode →]

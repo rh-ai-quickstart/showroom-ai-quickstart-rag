@@ -1,29 +1,33 @@
 = Accessing the Cluster
 :navtitle: Accessing the Cluster
+:imagesdir: ../images
 
-All RAG components run inside the `llama-stack-rag` namespace on OpenShift.
+All RAG components run inside *your* OpenShift *project* (Kubernetes namespace) for this lab — for example, in the AI Quickstart RAG catalog deployment the namespace is typically `user-<unique-id>-rag`, not a fixed name like `llama-stack-rag`.
 This page walks through what you should see for pods, services, and routes — and how to reach the chatbot UI.
+
+[NOTE]
+====
+In every `oc` command below, replace `NAMESPACE` with your project name from the OpenShift console (the project selector in the upper left), or from your lab environment instructions.
+====
+
+== Accessing the Cluster
+From the OpenShift Demo Platform click advanced settings. In the advanced settings is a username and password to login to the cluster.
+
+image::advanced-settings.png[Advanced settings]
+
+Next we need to login to the cluster via the OpenShift UI. In the demo platform click the OpenShift UI button at the top right.
+
+image::openshift-click.png[OpenShift UI]
+
+Login with the username and password from the advanced settings.
 
 == Checking Pods
 
-Run the following to list all pods in the namespace:
+After logging in to the OpenShift UI, we need to check the pods in the namespace. You will see a single project in the UI. In the top left hand corner click on the hamburger menu and select "Workloads/Pods".
 
-[source,bash]
-----
-oc get pods -n llama-stack-rag
-----
+image::pods.png[Pods]
 
-A healthy cluster will show output similar to the following.
-Every pod should be in `Running` status (or `Completed` for one-shot Job pods):
-
-[source]
-----
-NAME                                        READY   STATUS      RESTARTS   AGE
-llamastack-ui-xxxxxxxxx-xxxxx               1/1     Running     0          10m
-llamastack-xxxxxxxxx-xxxxx                  1/1     Running     0          10m
-postgresql-xxxxxxxxx-xxxxx                  1/1     Running     0          20m
-rag-ingest-pipeline-xxxxx                   0/1     Completed   0          12m
-----
+A healthy cluster will show output similar to the photo above.
 
 .Key pods to verify
 [cols="2,3",options="header"]
@@ -35,12 +39,6 @@ rag-ingest-pipeline-xxxxx                   0/1     Completed   0          12m
 
 |`llamastack`
 |LlamaStack server — orchestrates the LLM, embeddings, and tools
-
-|`predictor` (LLM)
-|KServe / vLLM model server for the generation model (e.g., `Llama-3.2-3B-Instruct`)
-
-|`predictor` (safety)
-|KServe / vLLM model server for the guard/shield model (e.g., `Llama-Guard-3-8B`) — only present if safety was enabled
 
 |`postgresql`
 |PostgreSQL + PGVector — stores document embeddings for the vector store
@@ -56,40 +54,56 @@ If the system was configured with `RAW_DEPLOYMENT=false`, expect `3/3`.
 The `llamastack` pod will not reach `Running` until all predictor pods are healthy.
 ====
 
-=== Filtering by Component
+=== Using the CLI to check pods
 
-To focus on just the model server pods:
+To run CLI commands against the cluster, you first need to log in via the CLI. In the OpenShift UI, click the button in the top right corner labeled "Copy Login Command".
+
+image::login-command.png[Copy Login Command]
+
+The login command will look something like this:
+[source,bash]
+----
+oc login --token=sha256~8uvgDNglxuJ3l_NwHMuWYPaJWur_dmtuq-4r5sUalU4 --server=https://api.ai-dev02.kni.syseng.devcluster.openshift.com:6443
+----
+
+Paste this command into your terminal and press Enter.
+
+[NOTE]
+====
+If your cluster uses self-signed certificates, you may need to add the `--insecure-skip-tls-verify=true` flag to the login command, like so:
+[source,bash]
+----
+oc login --token=... --server=... --insecure-skip-tls-verify=true
+----
+====
+
+Once you've logged in, you can run commands to check the pods.
 
 [source,bash]
 ----
-oc get pods -l component=predictor -n llama-stack-rag
+oc get pods -l component=predictor -n NAMESPACE
 ----
 
 To check the LlamaStack orchestration pod specifically:
 
 [source,bash]
 ----
-oc get pods -l app.kubernetes.io/name=llamastack -n llama-stack-rag
+oc get pods -l app.kubernetes.io/name=llamastack -n NAMESPACE
 ----
 
 == Checking Services
 
 Services expose each component internally within the cluster:
 
+In the OpenShift UI, click on the "Networking/Services" menu item in the left hand navigation.
+
+image::services.png[Services]
+
+Or run the following command from the CLI:
+
 [source,bash]
 ----
-oc get svc -n llama-stack-rag
-----
-
-Expected output:
-
-[source]
-----
-NAME                            TYPE        CLUSTER-IP       PORT(S)     AGE
-llamastack                      ClusterIP   172.30.x.x       5000/TCP    20m
-llamastack-ui                   ClusterIP   172.30.x.x       8501/TCP    20m
-llama-3-2-3b-instruct           ClusterIP   172.30.x.x       8080/TCP    20m
-postgresql                      ClusterIP   172.30.x.x       5432/TCP    20m
+oc get svc -n NAMESPACE
 ----
 
 .What each service does
@@ -103,23 +117,21 @@ postgresql                      ClusterIP   172.30.x.x       5432/TCP    20m
 |`llamastack-ui`
 |Internal HTTP endpoint for the Streamlit UI (port 8501)
 
-|`llama-3-2-3b-instruct`
-|vLLM inference endpoint for the generation model
-
-|`llama-guard-3-8b`
-|vLLM inference endpoint for the safety/shield model (if enabled)
-
 |`postgresql`
 |Internal PostgreSQL + PGVector endpoint (port 5432)
 |===
 
 == Checking Routes
 
-Routes expose the UI and API to the outside world. Retrieve them with:
+Routes expose the UI and API to the outside world. In the OpenShift UI, click on the "Networking/Routes" menu item in the left hand navigation.
+
+image::routes.png[Routes]
+
+Or run the following command from the CLI:
 
 [source,bash]
 ----
-oc get routes -n llama-stack-rag
+oc get routes -n NAMESPACE
 ----
 
 Expected output:
@@ -127,9 +139,12 @@ Expected output:
 [source]
 ----
 NAME              HOST/PORT                                                    PATH   SERVICES        PORT    TERMINATION   WILDCARD
-llamastack        llamastack-llama-stack-rag.apps.<cluster-domain>                    llamastack      5000    edge          None
-llamastack-ui     llamastack-ui-llama-stack-rag.apps.<cluster-domain>                llamastack-ui   8501    edge          None
+llamastack        llamastack-NAMESPACE.apps.cluster-domain                            llamastack      5000    edge          None
+llamastack-ui     llamastack-ui-NAMESPACE.apps.cluster-domain                         llamastack-ui   8501    edge          None
 ----
+
+Where `NAMESPACE` is the same project name you passed to `oc get routes -n`, and `cluster-domain` stands for your cluster's apps ingress domain (the DNS suffix that appears after `apps.` in a typical route hostname).
+The `HOST/PORT` values are assigned by your cluster — copy the exact URLs from your own `oc get routes` output instead of reconstructing them from a generic example.
 
 .Route breakdown
 [cols="2,3",options="header"]
@@ -157,3 +172,6 @@ When the Streamlit UI loads you will see:
 ** *System prompt* — override the default system prompt
 
 The application comes pre-loaded with FantaCo's internal HR, procurement, sales, and IT documents so you can begin asking questions immediately.
+
+[.next-nav]
+xref:03-knowledge-base.adoc[Next: Knowledge Base →]

@@ -40,3 +40,6 @@ Document extraction and chunking can run in one of two modes:
 ====
 A toggle to switch between local and pipeline-based extraction/chunking is being added and will be available in an upcoming release.
 ====
+
+[.next-nav]
+xref:04-chat-mode.adoc[Next: Chat Mode →]

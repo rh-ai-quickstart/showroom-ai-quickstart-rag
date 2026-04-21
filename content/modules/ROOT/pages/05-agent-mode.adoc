@@ -1,12 +1,19 @@
 = Using Agent Mode
 :navtitle: Agent Mode
+:imagesdir: ../images
 
 Agent mode enables multi-step, agentic interaction with the LLM. The model can plan, reason, and call tools across multiple turns before returning a final answer. You can use it with a knowledge base for agentic RAG, or without one so the agent relies solely on its training data and any connected tools.
 
 == Starting an Agent Session
 
 . In the sidebar, set *Mode* to *Agent*.
+
+image::agent-mode.png[Agent Mode]
+
 . Optionally select a knowledge base to make available to the agent as a retrieval tool. Leave it unset to let the agent work without document retrieval.
+
+image::select-knowledge.png[Select Knowledge Base]
+
 . Submit your query as you would in chat mode.
 
 == Agent Without a Knowledge Base
@@ -108,3 +115,6 @@ A full context window gives the model the best chance of retaining all retrieved
 ====
 Agent mode is best suited for multi-part questions that require synthesizing information from several documents or knowledge base sections. If your question is straightforward and single-turn, Chat mode will be faster and simpler.
 ====
+
+[.next-nav]
+xref:06-querying-knowledge-base.adoc[Next: Querying the Knowledge Base →]
